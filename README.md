@@ -68,7 +68,76 @@ services:
       - "443:443"
     volumes:
       - ~/reverse-proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/ssl:ro
     networks:
       - mynetwork
 ```
+#### App Container
+Now we can add a container for our app. Add this as another service. This is an example of my portfolio website made with react but your app might look a bit different
+```
+portfolio:
+    build:
+      context: ~/apps/portfolio/
+      dockerfile: Dockerfile
+      args:
+        - VITE_PB_URI=h<link to api>
+    container_name: portfolio
+    restart: unless-stopped
+    expose:
+      - "4000"
+    networks:
+      - mynetwork
+```
+Explination:
+- `portfolio` this is the name of our service.
+- `build` since I am building my own image I need to specify where the Dockerfile is and the directory of the app.
+- `container_name` this is the name of the docker container
+- `expose` this exposes the specified port to the other containers on the same network (mynetwork)
+- `networks` this says what network the container is in (make sure its the same as the nginx one)
 
+### 4. **Nginx Config**
+Now we need to create a nginx.conf (also in the reverse-proxy folder) file to configure the reverse-proxy. This conf file will be used by the Nginx container to direct traffic to our app based on the domain.
+```
+events {}
+
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+}
+```
+Explination:
+- `events` we won't use this but its required to be there.
+- `http` this is where we will define the server block for our apps
+
+#### adding a server block for our app
+```
+server {
+        listen 80;
+        server_name emrymcgill.com www.emrymcgill.com;
+
+        return 301 https://emrymcgill.com$request_uri;
+}
+server {
+    listen 443 ssl;
+    server_name emrymcgill.com;
+
+    ssl_certificate /etc/ssl/live/emrymcgill.com/fullchain.pem;
+    ssl_certificate_key /etc/ssl/live/emrymcgill.com/privkey.pem;
+
+    location / {
+        proxy_pass http://portfolio:4000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+Here we are adding 2 server blocks. The first one will redirect any http request to a https request.
+
+### 5. **Adding SSL**
+To add SSL we will use certbot and letsencrypt. First make sure they are both installed, then run this command to get certs: `sudo certbot certonly --manual --preferred-challenges dns` then follow the instructions to get the certs. Since we used the --manual flag, we cannot do automatic cert renewal, so before the certs expire just run that command again to renew them.
