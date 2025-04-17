@@ -16,6 +16,58 @@ services:
     depends_on:
       - timebuddy_pocketbase
 
+portfolio:
+    build:
+      context: ~/apps/portfolio2/
+      dockerfile: Dockerfile
+      args:
+        - VITE_PB_URI=https://api.emrymcgill.com
+    container_name: portfolio
+    restart: unless-stopped
+    ports:
+      - "4000:4001"
+    networks:
+      - mynetwork
+
+  portfolio_pocketbase:
+    build:
+      context: ~/apps/portfolio2/pocketbase
+      dockerfile: Dockerfile
+    container_name: portfolio_pocketbase
+    restart: unless-stopped
+    expose:
+      - "8081"
+    volumes:
+      - ~/apps/portfolio2/pocketbase/pocketbase_data:/pb_data
+    networks:
+      - mynetwork
+
+  expressonotes:
+    build:
+      context: ~/apps/expressonotes/
+      dockerfile: Dockerfile
+      args:
+        - VITE_PB_URI=https://expressonotes.api.emrymcgill.com
+    container_name: expressonotes
+    restart: unless-stopped
+    expose:
+      - "4000"
+    networks:
+      - mynetwork
+
+  expressonotes_pocketbase:
+    build:
+      context: ~/apps/expressonotes/pocketbase
+      dockerfile: Dockerfile
+    container_name: expressonotes_pocketbase
+    restart: unless-stopped
+    expose:
+    - "8082"
+    volumes:
+    - ~/apps/expressonotes/pocketbase/pocketbase_data:/pb_data
+    networks:
+    - mynetwork
+
 networks:
   mynetwork:
     driver: bridge
