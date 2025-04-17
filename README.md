@@ -1,5 +1,5 @@
-# nginx-docker-stack
-To hold my knoledge of configuring a Nginx reverse proxy with Docker containers to serve my apps to the internet
+# Nginx Reverse Proxy to host services in Docker containers
+A guide for myself to remember and document my learning of configuring a reverse proxy to host my apps.
 
 ## Project Setup
 
