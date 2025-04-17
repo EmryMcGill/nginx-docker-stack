@@ -1,13 +1,6 @@
 # nginx-docker-stack
 To hold my knoledge of configuring a Nginx reverse proxy with Docker containers to serve my apps to the internet
 
-## Docker commands
-- stop running containers: `docker compose down`
-- start all container: `docker compose up --build -d`
-- force a new build: `docker compose build <container name>`
-
-
-
 ## Project Setup
 
 ### 1. **Prepare Your Server**
@@ -200,4 +193,13 @@ server {
 
 ## Adding SSL
 To add SSL we will use certbot and letsencrypt. First make sure they are both installed, then run this command to get certs: `sudo certbot certonly --manual --preferred-challenges dns` then follow the instructions to get the certs. Since we used the --manual flag, we cannot do automatic cert renewal, so before the certs expire just run that command again to renew them.
+
+## starting the services
+Finally we can get our apps up and running. Inside the `reverse-proxy` folder run `docker compose up --build -d` to build and start all of the containers. 
+
+## Some other useful docker commands
+- `docker compose down` : to stop and removes all containers (good if you changed the configuration like docker-compose file)
+- `docker compose up --build -d` : builds and starts all containers
+- `docker compose build <container name>` : forces a re-builds on a specific container
+- `docker-compose restart <conatiner name>` : to restart a container (good if you changed the app but not the configuration)
 
