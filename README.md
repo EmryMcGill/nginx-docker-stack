@@ -203,3 +203,6 @@ Finally we can get our apps up and running. Inside the `reverse-proxy` folder ru
 - `docker compose build <container name>` : forces a re-builds on a specific container
 - `docker-compose restart <conatiner name>` : to restart a container (good if you changed the app but not the configuration)
 
+## Some useful Certbot commands
+- `certbot certificates` : lists all certificates (good to see expiry date)
+- `sudo certbot certonly --manual --preferred-challenges dns` : to create or renew certs
