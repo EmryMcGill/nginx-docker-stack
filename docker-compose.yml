@@ -38,7 +38,7 @@ portfolio:
     expose:
       - "8081"
     volumes:
-      - ~/apps/portfolio2/pocketbase/pocketbase_data:/pb_data
+      - ~/apps/portfolio2/pocketbase/pb_data:/pb/pb_data
     networks:
       - mynetwork
 
@@ -71,6 +71,3 @@ portfolio:
 networks:
   mynetwork:
     driver: bridge
-
-volumes:
-  pb_data:
