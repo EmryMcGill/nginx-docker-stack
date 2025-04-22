@@ -156,14 +156,14 @@ Now we can add a container for our service. Add this as another service in the `
 ```
 portfolio_pocketbase:
     build:
-      context: ~/apps/portfolio/pocketbase
+      context: ~/apps/portfolio2/pocketbase
       dockerfile: Dockerfile
     container_name: portfolio_pocketbase
     restart: unless-stopped
     expose:
-      - "8000"
+      - "8081"
     volumes:
-      - /root/apps/portfolio/pocketbase/pocketbase_data:/pb_data
+      - ~/apps/portfolio2/pocketbase/pb_data:/pb/pb_data
     networks:
       - mynetwork
 ```
@@ -190,6 +190,9 @@ server {
         }
 }
 ```
+
+### 5. **Apply migrations**
+After building and startign the container with `docker compose up --build -d <container-name>` you will need to go into the container and apply the migrations. Go into the container: `docker exec -it <container-name> /bin/sh`. then run `cd pb`, then run `./pocketbase migrate --dir ./pb_migrations`, then run `exit`
 
 ## Adding SSL
 To add SSL we will use certbot and letsencrypt. First make sure they are both installed, then run this command to get certs: `sudo certbot certonly --manual --preferred-challenges dns` then follow the instructions to get the certs. Since we used the --manual flag, we cannot do automatic cert renewal, so before the certs expire just run that command again to renew them.
